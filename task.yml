@@ -1,0 +1,28 @@
+---
+ - hosts: localhost
+   connection: local
+   tasks:
+       - name: creating instance
+         gcp_compute_instance:
+                 name: test
+                 machine_type: f1-micro
+                 disks:
+                     - auto_delete: true
+                       boot: true
+                       initialize_params:
+                               source_image: projects/debian-cloud/global/images/debian-10-buster-v20210217
+                 network_interfaces:
+                     - access_configs:
+                             - name: External NAT
+                               type: ONE_TO_ONE_NAT
+                 metadata:
+                         startup-script: |
+                                 #!/bin/bash
+                                 sudo apt-get update
+                                 sudo apt-get install apache2 -y
+                                 sudo echo "HELLO WORLD !!" > /var/www/html/index.html 
+                 zone: us-central1-a
+                 project: migcpproject
+                 auth_kind: serviceaccount
+                 service_account_file: ./service.json
+                 state: present
